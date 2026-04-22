@@ -24,8 +24,22 @@ export default function Timesheet() {
     if (user?.employee_id) {
       fetchTimesheets();
       fetchSummary();
+    } else if (user?.role === 'hr_admin' || user?.role === 'project_manager') {
+      fetchAllTimesheets();
+      setLoading(false);
     }
   }, [user, token]);
+
+  const fetchAllTimesheets = async () => {
+    try {
+      const res = await api.get('/api/timesheet/', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTimesheets(res.data);
+    } catch (err) {
+      console.error('Error fetching timesheets:', err);
+    }
+  };
 
   const fetchTimesheets = async () => {
     try {
@@ -60,8 +74,12 @@ export default function Timesheet() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setOpenDialog(false);
-      fetchTimesheets();
-      fetchSummary();
+      if (user.employee_id) {
+        fetchTimesheets();
+        fetchSummary();
+      } else {
+        fetchAllTimesheets();
+      }
       setSnackbar({ open: true, message: 'Timesheet entry saved', severity: 'success' });
     } catch (err) {
       console.error('Error creating timesheet:', err);
@@ -74,7 +92,11 @@ export default function Timesheet() {
       await api.put(`/api/timesheet/${id}/approve`, null, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      fetchTimesheets();
+      if (user.employee_id) {
+        fetchTimesheets();
+      } else {
+        fetchAllTimesheets();
+      }
       setSnackbar({ open: true, message: 'Timesheet approved', severity: 'success' });
     } catch (err) {
       console.error('Error approving timesheet:', err);
@@ -90,42 +112,53 @@ export default function Timesheet() {
         <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1877f2' }}>
           ⏱️ Timesheet
         </Typography>
-        <Button variant="contained" onClick={() => setOpenDialog(true)} sx={{ background: '#1877f2' }}>
-          Add Entry
-        </Button>
+        {user?.employee_id && (
+          <Button variant="contained" onClick={() => setOpenDialog(true)} sx={{ background: '#1877f2' }}>
+            Add Entry
+          </Button>
+        )}
       </Box>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={4}>
-          <Card sx={{ background: '#1877f2', color: 'white' }}>
-            <CardContent>
-              <Typography>Total Hours</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                {summary?.total_hours ?? 0}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Card sx={{ background: '#34a853', color: 'white' }}>
-            <CardContent>
-              <Typography>Overtime Hours</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                {summary?.total_overtime ?? 0}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Card sx={{ background: '#fbbc04', color: 'white' }}>
-            <CardContent>
-              <Typography>Days Recorded</Typography>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                {summary?.days_recorded ?? 0}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+        {user?.employee_id && (
+          <>
+            <Grid item xs={12} sm={4}>
+              <Card sx={{ background: '#1877f2', color: 'white' }}>
+                <CardContent>
+                  <Typography>Total Hours</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                    {summary?.total_hours ?? 0}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Card sx={{ background: '#34a853', color: 'white' }}>
+                <CardContent>
+                  <Typography>Overtime Hours</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                    {summary?.total_overtime ?? 0}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Card sx={{ background: '#fbbc04', color: 'white' }}>
+                <CardContent>
+                  <Typography>Days Recorded</Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                    {summary?.days_recorded ?? 0}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </>
+        )}
+        {!user?.employee_id && (user?.role === 'hr_admin' || user?.role === 'project_manager') && (
+          <Grid item xs={12}>
+            <Alert severity="info">Showing all timesheet entries. You can view and approve timesheets for all employees.</Alert>
+          </Grid>
+        )}
       </Grid>
 
       <Card>
@@ -133,6 +166,7 @@ export default function Timesheet() {
           <Table>
             <TableHead sx={{ backgroundColor: '#f0f2f5' }}>
               <TableRow>
+                {!user?.employee_id && <TableCell><strong>Employee ID</strong></TableCell>}
                 <TableCell><strong>Date</strong></TableCell>
                 <TableCell><strong>Hours Worked</strong></TableCell>
                 <TableCell><strong>Overtime</strong></TableCell>
@@ -143,6 +177,7 @@ export default function Timesheet() {
             <TableBody>
               {timesheets.map(ts => (
                 <TableRow key={ts.id}>
+                  {!user?.employee_id && <TableCell>{ts.employee_id}</TableCell>}
                   <TableCell>{ts.date}</TableCell>
                   <TableCell>{ts.hours_worked}</TableCell>
                   <TableCell>{ts.overtime_hours}</TableCell>

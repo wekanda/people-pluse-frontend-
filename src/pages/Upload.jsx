@@ -42,7 +42,6 @@ export default function Upload() {
       const res = await api.post('/upload/excel', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
         },
       });
       setStatus(res.data.message || 'Upload completed successfully.');
