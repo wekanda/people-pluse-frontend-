@@ -46,7 +46,9 @@ export default function Upload() {
       });
       setStatus(res.data.message || 'Upload completed successfully.');
     } catch (err) {
-      setError(err.response?.data?.detail || err.message || 'Upload failed');
+      console.error('Upload error:', err);
+      const errorMessage = err.response?.data?.detail || err.message || 'Upload failed';
+      setError(errorMessage);
       setStatus('');
     } finally {
       setUploading(false);
