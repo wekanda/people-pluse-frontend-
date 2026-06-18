@@ -31,6 +31,9 @@ export default function Upload() {
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
   const [results, setResults] = useState([]);
+  const [wordFiles, setWordFiles] = useState([]);
+  const [wordResults, setWordResults] = useState([]);
+  const [wordUploading, setWordUploading] = useState(false);
   const [payslipFiles, setPayslipFiles] = useState([]);
   const [payslipResults, setPayslipResults] = useState([]);
   const [payslipUploading, setPayslipUploading] = useState(false);
@@ -44,6 +47,14 @@ export default function Upload() {
     setStatus('');
     setError('');
     setResults([]);
+  };
+
+  const handleWordFileChange = (event) => {
+    const selectedFiles = Array.from(event.target.files || []);
+    setWordFiles(selectedFiles);
+    setStatus('');
+    setError('');
+    setWordResults([]);
   };
 
   const handlePayslipFileChange = (event) => {
@@ -122,6 +133,38 @@ export default function Upload() {
     setResults(uploadResults);
     setStatus('Upload process finished.');
     setUploading(false);
+  };
+
+  const handleWordUpload = async () => {
+    if (wordFiles.length === 0) {
+      setError('Please select a Word (.docx) file first.');
+      return;
+    }
+
+    setWordUploading(true);
+    setError('');
+    setStatus('Uploading Word documents...');
+    const uploadResults = [];
+
+    for (const fileItem of wordFiles) {
+      try {
+        const formData = new FormData();
+        formData.append('file', fileItem);
+        const res = await api.post('/upload/word', formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        uploadResults.push({ file: fileItem.name, success: true, message: res.data.message });
+      } catch (err) {
+        const errorMessage = err.response?.data?.detail || err.message || 'Upload failed';
+        uploadResults.push({ file: fileItem.name, success: false, message: errorMessage });
+      }
+    }
+
+    setWordResults(uploadResults);
+    setStatus('Word upload process finished.');
+    setWordUploading(false);
   };
 
   const handlePayslipUpload = async () => {
@@ -226,6 +269,50 @@ export default function Upload() {
                 Upload results
               </Typography>
               {results.map((result) => (
+                <Typography key={result.file} sx={{ color: result.success ? 'success.main' : 'error.main', mb: 0.5 }}>
+                  {result.file}: {result.message}
+                </Typography>
+              ))}
+            </Paper>
+          )}
+        </Stack>
+      </Paper>
+
+      <Paper sx={{ p: 4, mb: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+        <Stack spacing={2}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+            Import Word documents (.docx)
+          </Typography>
+          <Input
+            id="word-upload"
+            type="file"
+            inputProps={{ accept: '.docx', multiple: true }}
+            onChange={handleWordFileChange}
+            sx={{ bgcolor: '#f8fbff', p: 1, borderRadius: 2 }}
+          />
+          <Typography variant="body2" color="text.secondary">
+            Upload Word documents containing employee or HR record details. The system will extract key fields and update the staff record automatically.
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={handleWordUpload}
+            disabled={wordFiles.length === 0 || wordUploading}
+            sx={{ background: '#1877f2', width: 280, textTransform: 'none' }}
+          >
+            Upload Word Documents
+          </Button>
+          {wordFiles.length > 0 && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              Selected files: {wordFiles.map((file) => file.name).join(', ')}
+            </Typography>
+          )}
+          {wordUploading && <LinearProgress />}
+          {wordResults.length > 0 && (
+            <Paper sx={{ p: 2, mt: 2, borderRadius: 3, bgcolor: '#f8fbff' }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                Word upload results
+              </Typography>
+              {wordResults.map((result) => (
                 <Typography key={result.file} sx={{ color: result.success ? 'success.main' : 'error.main', mb: 0.5 }}>
                   {result.file}: {result.message}
                 </Typography>

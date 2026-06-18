@@ -19,6 +19,7 @@ const navItems = [
   { label: '📊 Analytics', path: '/reporting', roles: ['hr_admin', 'project_manager'] },
   { label: '🚀 Onboarding', path: '/onboarding', roles: ['hr_admin', 'project_manager'] },
   { label: '📝 Contracts', path: '/contracts', roles: ['hr_admin', 'project_manager'] },
+  { label: '📄 Documents', path: '/documents', roles: ['hr_admin', 'project_manager'] },
   { label: '� Interviews', path: '/interviews', roles: ['hr_admin', 'project_manager'] },
   { label: '�🎓 Internships', path: '/internships', roles: ['hr_admin', 'project_manager'] },
   { label: '👥 Staff Directory', path: '/staff', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
@@ -150,7 +151,7 @@ export default function DashboardLayout() {
               </Button>
               <Button
                 component={NavLink}
-                to="/upload"
+                to="/documents"
                 size="small"
                 variant="outlined"
                 sx={{ color: '#ffffff', borderColor: 'rgba(255,255,255,0.25)', textTransform: 'none' }}

@@ -19,11 +19,15 @@ export default function ContractGeneration() {
     department: '',
     start_date: '',
     employment_type: 'Full-time',
+    currency: 'KES',
     salary: '',
     benefits: 'Health insurance, Pension',
     manager_name: '',
-    employer_name: ''
+    employer_name: '',
+    email: ''
   });
+  const [sendStatus, setSendStatus] = useState('');
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     const loadTemplates = async () => {
@@ -49,6 +53,7 @@ export default function ContractGeneration() {
     }
 
     setLoading(true);
+    setSendStatus('');
     try {
       const res = await api.post('/documents/generate', formData, {
         headers: { Authorization: `Bearer ${token}` }
@@ -59,6 +64,27 @@ export default function ContractGeneration() {
       alert('Failed to generate document');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSendDocument = async () => {
+    if (!formData.email) {
+      alert('Enter a recipient email to send the document');
+      return;
+    }
+
+    setSending(true);
+    setSendStatus('');
+    try {
+      const res = await api.post('/documents/send', formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSendStatus(res.data?.message || 'Document send request completed');
+    } catch (err) {
+      console.error('Error sending document:', err);
+      setSendStatus('Sending document failed');
+    } finally {
+      setSending(false);
     }
   };
 
@@ -145,10 +171,30 @@ export default function ContractGeneration() {
               </TextField>
 
               <TextField
-                label="Annual Salary (KES)"
+                label="Currency"
+                select
+                value={formData.currency}
+                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                fullWidth
+              >
+                <MenuItem value="KES">KES</MenuItem>
+                <MenuItem value="UGX">UGX</MenuItem>
+                <MenuItem value="USD">USD</MenuItem>
+              </TextField>
+
+              <TextField
+                label="Annual Salary"
                 type="number"
                 value={formData.salary}
                 onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
+                fullWidth
+              />
+
+              <TextField
+                label="Recipient Email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 fullWidth
               />
 
@@ -210,7 +256,7 @@ export default function ContractGeneration() {
                   {generatedDoc.content}
                 </Box>
                 
-                <Stack direction="row" spacing={1}>
+                <Stack direction="row" spacing={1} flexWrap="wrap">
                   <Button
                     variant="contained"
                     startIcon={<ContentCopyIcon />}
@@ -227,7 +273,22 @@ export default function ContractGeneration() {
                   >
                     Download
                   </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleSendDocument}
+                    disabled={sending}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    {sending ? 'Sending...' : 'Send Document'}
+                  </Button>
                 </Stack>
+
+                {sendStatus && (
+                  <Box sx={{ mt: 2, p: 2, bgcolor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 1 }}>
+                    <Typography variant="body2" sx={{ color: '#1d4ed8' }}>{sendStatus}</Typography>
+                  </Box>
+                )}
 
                 <Box sx={{ mt: 2, p: 2, bgcolor: '#f0fdf4', border: '1px solid #dcfce7', borderRadius: 1 }}>
                   <Typography variant="caption" sx={{ color: '#166534' }}>

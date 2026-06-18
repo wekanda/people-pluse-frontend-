@@ -37,12 +37,10 @@ export function AuthProvider({ children }) {
         localStorage.setItem('user', JSON.stringify(userRes.data));
       } catch (err) {
         console.error('Auth restore failed:', err);
-        if (!localUser) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          setToken(null);
-          setUser(null);
-        }
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setToken(null);
+        setUser(null);
       } finally {
         setLoadingAuth(false);
       }
@@ -87,7 +85,13 @@ export function AuthProvider({ children }) {
     return null;
   }
 
-  return <AuthContext.Provider value={{ user, token, login, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, token, loading: loadingAuth, login, logout }}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth() { return useContext(AuthContext); }
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}

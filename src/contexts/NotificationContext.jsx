@@ -9,7 +9,8 @@ const NotificationContext = createContext({
 });
 
 export function NotificationProvider({ children }) {
-  const { token } = useAuth();
+  const auth = useAuth();
+  const token = auth?.token || null;
   const [unreadCount, setUnreadCount] = useState(0);
 
   const refreshUnreadCount = useCallback(async () => {

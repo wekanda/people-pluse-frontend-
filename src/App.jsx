@@ -1,5 +1,5 @@
-import React, { useState, createContext, useContext } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useState, createContext } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box } from '@mui/material';
@@ -31,9 +31,10 @@ import Compliance from './pages/Compliance';
 import Reporting from './pages/Reporting';
 import Onboarding from './pages/Onboarding';
 import ContractGeneration from './pages/ContractGeneration';
+import Documents from './pages/Documents';
 import InterviewScheduling from './pages/InterviewScheduling';
 import ProtectedRoute from './components/ProtectedRoute';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { useAuth } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -87,8 +88,7 @@ function AppContent() {
     },
   });
 
-  const { user, logout } = useAuth();
-  if (!user) return <Login />;
+  const { user } = useAuth();
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -97,6 +97,7 @@ function AppContent() {
 
         <Box sx={{ minHeight: '100vh' }}>
           <Routes>
+            <Route path="/login" element={<Login />} />
             <Route path="/" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
               {/* Removed duplicate 'My Dashboard' route; single Dashboard at '/' */}
@@ -116,6 +117,7 @@ function AppContent() {
               <Route path="reporting" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Reporting /></ProtectedRoute>} />
               <Route path="onboarding" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Onboarding /></ProtectedRoute>} />
               <Route path="contracts" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><ContractGeneration /></ProtectedRoute>} />
+              <Route path="documents" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Documents /></ProtectedRoute>} />
               <Route path="interviews" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><InterviewScheduling /></ProtectedRoute>} />
               <Route path="internships" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Internship /></ProtectedRoute>} />
               <Route path="finance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance']}><Finance /></ProtectedRoute>} />
@@ -127,6 +129,7 @@ function AppContent() {
               <Route path="notifications" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Notifications /></ProtectedRoute>} />
               <Route path="upload" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Upload /></ProtectedRoute>} />
             </Route>
+            <Route path="*" element={<Navigate to={user ? '/' : '/login'} replace />} />
           </Routes>
         </Box>
       </ThemeProvider>
@@ -137,11 +140,9 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <NotificationProvider>
-          <AppContent />
-        </NotificationProvider>
-      </AuthProvider>
+      <NotificationProvider>
+        <AppContent />
+      </NotificationProvider>
     </BrowserRouter>
   );
 }
