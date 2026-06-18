@@ -5,8 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNotifications } from '../contexts/NotificationContext';
 
 const navItems = [
-  { label: '📊 Dashboard', path: '/', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
-  { label: '🧾 Payslips', path: '/payslips', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
+  { label: '📊 Dashboard', path: '/', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
+  { label: '🧾 Payslips', path: '/payslips', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
   { label: '💼 Recruitment', path: '/recruitment', roles: ['hr_admin', 'project_manager'] },
   { label: '🧾 Job Admin', path: '/recruitment-admin', roles: ['hr_admin', 'project_manager'] },
   { label: '👤 Applicants', path: '/applicants', roles: ['hr_admin', 'project_manager'] },
@@ -22,8 +22,8 @@ const navItems = [
   { label: '📄 Documents', path: '/documents', roles: ['hr_admin', 'project_manager'] },
   { label: '� Interviews', path: '/interviews', roles: ['hr_admin', 'project_manager'] },
   { label: '�🎓 Internships', path: '/internships', roles: ['hr_admin', 'project_manager'] },
-  { label: '👥 Staff Directory', path: '/staff', roles: ['hr_admin', 'project_manager', 'staff', 'finance'] },
-  { label: '💰 Finance', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance'] },
+  { label: '👥 Staff Directory', path: '/staff', roles: ['hr_admin', 'project_manager', 'staff', 'finance', 'pay'] },
+  { label: '💰 Finance', path: '/finance', roles: ['hr_admin', 'project_manager', 'finance', 'pay'] },
   { label: '🏖️ Leave Management', path: '/leave', roles: ['hr_admin', 'project_manager', 'staff'] },
   { label: '⏱️ Timesheet', path: '/timesheet', roles: ['hr_admin', 'project_manager', 'staff'] },
   { label: '⭐ Appraisals', path: '/appraisals', roles: ['hr_admin', 'project_manager', 'staff'] },

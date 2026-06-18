@@ -120,8 +120,8 @@ function AppContent() {
               <Route path="documents" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Documents /></ProtectedRoute>} />
               <Route path="interviews" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><InterviewScheduling /></ProtectedRoute>} />
               <Route path="internships" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager']}><Internship /></ProtectedRoute>} />
-              <Route path="finance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance']}><Finance /></ProtectedRoute>} />
-              <Route path="payslips" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance']}><Payslip /></ProtectedRoute>} />
+              <Route path="finance" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'finance', 'pay']}><Finance /></ProtectedRoute>} />
+              <Route path="payslips" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff', 'finance', 'pay']}><Payslip /></ProtectedRoute>} />
               <Route path="leave" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><LeaveManagement /></ProtectedRoute>} />
               <Route path="timesheet" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><Timesheet /></ProtectedRoute>} />
               <Route path="appraisals" element={<ProtectedRoute allowedRoles={['hr_admin', 'project_manager', 'staff']}><PerformanceAppraisal /></ProtectedRoute>} />
